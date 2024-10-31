@@ -64,6 +64,7 @@ NOMBRE_ARCHIVO="${DIRECTORIO}/${BASE_NOMBRE}_${TIPO}.pem"
 NOMBRE_PUB="${DIRECTORIO}/${BASE_NOMBRE}_${TIPO}.pub"
 NOMBRE_PPK="${DIRECTORIO}/${BASE_NOMBRE}_${TIPO}.ppk"
 NOMBRE_COMPRESO="${DIRECTORIO}/${BASE_NOMBRE}_${TIPO}.tar.gz"
+INSTRUCCIONES="${DIRECTORIO}/${BASE_NOMBRE}_${TIPO}_instrucciones.txt"
 
 # Generación de las llaves
 if [ "$TIPO" == "rsa" ]; then
@@ -85,11 +86,40 @@ else
     echo "Advertencia: puttygen no está instalado. No se generará el archivo .ppk."
 fi
 
-# Comprimir las llaves en un archivo tar.gz
-tar -czf "$NOMBRE_COMPRESO" -C "$DIRECTORIO" "$(basename "$NOMBRE_ARCHIVO")" "$(basename "$NOMBRE_PUB")" "$(basename "$NOMBRE_PPK")"
+# Crear el archivo de instrucciones de uso
+cat > "$INSTRUCCIONES" << EOF
+Instrucciones de Uso de las Claves Generadas
+
+Este archivo contiene instrucciones sobre cómo utilizar cada uno de los archivos generados:
+
+1. ${BASE_NOMBRE}_${TIPO}.pem:
+   - Archivo de clave privada.
+   - Uso: Utilizado para autenticación SSH en sistemas Unix/Linux.
+   - Para iniciar sesión, se recomienda utilizar el comando:
+     ssh -i ${BASE_NOMBRE}_${TIPO}.pem usuario@direccion_ip
+   - **Nota**: Mantenlo en un lugar seguro y no lo compartas.
+
+2. ${BASE_NOMBRE}_${TIPO}.pub:
+   - Archivo de clave pública.
+   - Uso: Este archivo debe agregarse al archivo "authorized_keys" del servidor al que deseas conectarte.
+   - Para añadirlo al servidor:
+     ssh-copy-id -i ${BASE_NOMBRE}_${TIPO}.pub usuario@direccion_ip
+   - La clave pública permite la autenticación sin contraseña desde la máquina con la clave privada.
+
+3. ${BASE_NOMBRE}_${TIPO}.ppk:
+   - Archivo de clave privada en formato PPK, para uso con PuTTY.
+   - Uso: Utilizado en entornos Windows con el cliente PuTTY.
+   - Configuración en PuTTY:
+     - Ve a "Connection > SSH > Auth" y selecciona este archivo para autenticación.
+   - **Nota**: Es necesario solo si usas PuTTY como cliente SSH.
+
+EOF
+
+# Comprimir las llaves y el archivo de instrucciones en un archivo tar.gz
+tar -czf "$NOMBRE_COMPRESO" -C "$DIRECTORIO" "$(basename "$NOMBRE_ARCHIVO")" "$(basename "$NOMBRE_PUB")" "$(basename "$NOMBRE_PPK")" "$(basename "$INSTRUCCIONES")"
 
 # Eliminar archivos temporales, excepto el archivo comprimido
-rm -f "$NOMBRE_ARCHIVO" "$NOMBRE_PUB" "$NOMBRE_PPK"
+rm -f "$NOMBRE_ARCHIVO" "$NOMBRE_PUB" "$NOMBRE_PPK" "$INSTRUCCIONES"
 
 # Mensaje de éxito
-echo "Claves generadas y comprimidas en $NOMBRE_COMPRESO"
+echo "Claves e instrucciones generadas y comprimidas en $NOMBRE_COMPRESO"
