@@ -119,7 +119,8 @@ EOF
 tar -czf "$NOMBRE_COMPRESO" -C "$DIRECTORIO" "$(basename "$NOMBRE_ARCHIVO")" "$(basename "$NOMBRE_PUB")" "$(basename "$NOMBRE_PPK")" "$(basename "$INSTRUCCIONES")"
 
 # Eliminar archivos temporales, excepto el archivo comprimido
-rm -f "$NOMBRE_ARCHIVO" "$NOMBRE_PUB" "$NOMBRE_PPK" "$INSTRUCCIONES"
+# rm -f "$NOMBRE_ARCHIVO" "$NOMBRE_PUB" "$NOMBRE_PPK" "$INSTRUCCIONES"
+rm -f "$NOMBRE_ARCHIVO" "$NOMBRE_PPK" "$INSTRUCCIONES"
 
 # Mensaje de éxito
 echo "Claves e instrucciones generadas y comprimidas en $NOMBRE_COMPRESO"
